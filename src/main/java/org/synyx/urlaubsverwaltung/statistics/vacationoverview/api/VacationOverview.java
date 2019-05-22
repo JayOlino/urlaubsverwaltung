@@ -1,5 +1,6 @@
-package org.synyx.urlaubsverwaltung.holiday;
+package org.synyx.urlaubsverwaltung.statistics.vacationoverview.api;
 
+import org.synyx.urlaubsverwaltung.holiday.DayOfMonth;
 import org.synyx.urlaubsverwaltung.person.api.PersonResponse;
 
 import java.util.List;
