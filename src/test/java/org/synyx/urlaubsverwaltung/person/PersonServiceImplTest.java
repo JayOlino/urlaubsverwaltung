@@ -1,13 +1,16 @@
 package org.synyx.urlaubsverwaltung.person;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.synyx.urlaubsverwaltung.security.CustomPrincipal;
 import org.synyx.urlaubsverwaltung.testdatacreator.TestDataCreator;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,14 +29,19 @@ public class PersonServiceImplTest {
 
     private PersonDAO personDAO;
 
-    private SecurityContext securityContext = mock(SecurityContext.class);
+    private SecurityContext securityContext;
 
     @Before
     public void setUp() {
 
         personDAO = mock(PersonDAO.class);
-
+        securityContext = mock(SecurityContext.class);
         sut = new PersonServiceImpl(personDAO);
+    }
+
+    @After
+    public void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
 
@@ -360,7 +368,9 @@ public class PersonServiceImplTest {
         Person person = TestDataCreator.createPerson();
 
         Authentication authentication = mock(Authentication.class);
-        when(authentication.getName()).thenReturn(person.getNiceName());
+        Principal principal = mock(CustomPrincipal.class);
+        when(authentication.getPrincipal()).thenReturn(principal);
+        when(principal.getName()).thenReturn(person.getNiceName());
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
