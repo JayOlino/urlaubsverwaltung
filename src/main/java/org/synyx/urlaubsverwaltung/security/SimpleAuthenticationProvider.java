@@ -72,7 +72,7 @@ public class SimpleAuthenticationProvider implements AuthenticationProvider {
         if (encoder.matches(rawPassword, userPassword)) {
             LOG.info("User '{}' has signed in with roles: {}", username, grantedAuthorities);
 
-            return new UsernamePasswordAuthenticationToken(username, userPassword, grantedAuthorities);
+            return new UsernamePasswordAuthenticationToken(new CustomPrincipal(person.getId(), username), userPassword, grantedAuthorities);
         } else {
             LOG.info("User '{}' has tried to sign in with a wrong password", username);
 
