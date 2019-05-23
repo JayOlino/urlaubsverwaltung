@@ -53,6 +53,33 @@ public class RestApiSecurityConfigIT {
     }
 
     @Test
+    public void getAbsencesForOneselfIsOk() throws Exception {
+        mvc.perform(get("/api/absences")
+            .param("year", String.valueOf(LocalDate.now().getYear()))
+            .param("person", "1")
+            .with(httpBasic("testUser", "secret")))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getAbsencesAsNotPrivilegedUserForOtherUserIsForbidden() throws Exception {
+        mvc.perform(get("/api/absences")
+            .param("year", String.valueOf(LocalDate.now().getYear()))
+            .param("person", "2")
+            .with(httpBasic("testUser", "secret")))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getAbsencesAsOfficeUserForOtherUserIsOk() throws Exception {
+        mvc.perform(get("/api/absences")
+            .param("year", String.valueOf(LocalDate.now().getYear()))
+            .param("person", "1")
+            .with(httpBasic("test", "secret")))
+            .andExpect(status().isOk());
+    }
+
+    @Test
     public void getAvailabilitiesWithoutBasicAuthIsUnauthorized() throws Exception {
         mvc.perform(get("/api/availabilities"))
             .andExpect(status().isUnauthorized());
@@ -130,6 +157,46 @@ public class RestApiSecurityConfigIT {
                 .with(httpBasic("test", "secret")))
                 .andExpect(status().isOk());
 
+    }
+
+    @Test
+    public void getSicknotesWithNotPrivilegedUserIsForbidden() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        mvc.perform(get("/api/sicknotes")
+            .param("from", dtf.format(now))
+            .param("to", dtf.format(now.plusDays(5)))
+            .with(httpBasic("testUser", "secret")))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getSicknotesWithBossUserIsForbidden() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        mvc.perform(get("/api/sicknotes")
+            .param("from", dtf.format(now))
+            .param("to", dtf.format(now.plusDays(5)))
+            .with(httpBasic("testBoss", "secret")))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getSicknotesWithDepartmentHeadUserIsForbidden() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        mvc.perform(get("/api/sicknotes")
+            .param("from", dtf.format(now))
+            .param("to", dtf.format(now.plusDays(5)))
+            .with(httpBasic("testHead", "secret")))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getSicknotesWithSecondStageUserIsForbidden() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        mvc.perform(get("/api/sicknotes")
+            .param("from", dtf.format(now))
+            .param("to", dtf.format(now.plusDays(5)))
+            .with(httpBasic("testManager", "secret")))
+            .andExpect(status().isForbidden());
     }
 
     @Test
