@@ -90,7 +90,7 @@ public class OvertimeController {
         if (!departmentService.isSignedInUserAllowedToAccessPersonData(signedInUser, person)) {
             throw new AccessDeniedException(String.format(
                     "User '%s' has not the correct permissions to see overtime records of user '%s'",
-                    signedInUser.getLoginName(), person.getLoginName()));
+                    signedInUser.getId(), person.getId()));
         }
 
         model.addAttribute("year", year);
@@ -114,7 +114,7 @@ public class OvertimeController {
         if (!departmentService.isSignedInUserAllowedToAccessPersonData(signedInUser, person)) {
             throw new AccessDeniedException(String.format(
                     "User '%s' has not the correct permissions to see overtime records of user '%s'",
-                    signedInUser.getLoginName(), person.getLoginName()));
+                    signedInUser.getId(), person.getId()));
         }
 
         model.addAttribute("record", overtime);
@@ -144,7 +144,7 @@ public class OvertimeController {
         if (!signedInUser.equals(person) && !signedInUser.hasRole(Role.OFFICE)) {
             throw new AccessDeniedException(String.format(
                     "User '%s' has not the correct permissions to record overtime for user '%s'",
-                    signedInUser.getLoginName(), person.getLoginName()));
+                    signedInUser.getId(), person.getId()));
         }
 
         model.addAttribute("overtime", new OvertimeForm(person));
@@ -163,7 +163,7 @@ public class OvertimeController {
         if (!signedInUser.equals(person) && !signedInUser.hasRole(Role.OFFICE)) {
             throw new AccessDeniedException(String.format(
                     "User '%s' has not the correct permissions to record overtime for user '%s'",
-                    signedInUser.getLoginName(), person.getLoginName()));
+                    signedInUser.getId(), person.getId()));
         }
 
         validator.validate(overtimeForm, errors);
@@ -194,7 +194,7 @@ public class OvertimeController {
         if (!signedInUser.equals(person) && !signedInUser.hasRole(Role.OFFICE)) {
             throw new AccessDeniedException(String.format(
                     "User '%s' has not the correct permissions to edit overtime record of user '%s'",
-                    signedInUser.getLoginName(), person.getLoginName()));
+                    signedInUser.getId(), person.getId()));
         }
 
         model.addAttribute("overtime", new OvertimeForm(overtime));
@@ -216,7 +216,7 @@ public class OvertimeController {
         if (!signedInUser.equals(person) && !signedInUser.hasRole(Role.OFFICE)) {
             throw new AccessDeniedException(String.format(
                     "User '%s' has not the correct permissions to edit overtime record of user '%s'",
-                    signedInUser.getLoginName(), person.getLoginName()));
+                    signedInUser.getId(), person.getId()));
         }
 
         validator.validate(overtimeForm, errors);
