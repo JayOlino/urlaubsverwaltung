@@ -3,7 +3,9 @@ package org.synyx.urlaubsverwaltung.person.api;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,19 +13,22 @@ import org.synyx.urlaubsverwaltung.api.ResponseWrapper;
 import org.synyx.urlaubsverwaltung.person.Person;
 import org.synyx.urlaubsverwaltung.person.PersonService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.synyx.urlaubsverwaltung.person.api.PersonController.ROOT_URL;
+
 
 @Api("Persons: Get information about the persons of the application")
 @RestController("restApiPersonController")
-@RequestMapping("/api")
+@RequestMapping(ROOT_URL)
 public class PersonController {
 
-    private static final String ROOT_URL = "/persons";
-    private static final String PERSON_URL = ROOT_URL + "/{id}";
+    static final String ROOT_URL = "/api/persons";
+    private static final String PERSON_URL ="/{id}";
 
     private final PersonService personService;
 
@@ -36,11 +41,11 @@ public class PersonController {
     @ApiOperation(
         value = "Get all active persons of the application", notes = "Get all active persons of the application"
     )
-    @GetMapping(ROOT_URL)
-    public ResponseEntity<List<PersonResponse>> persons() {
+    @GetMapping
+    public ResponseEntity<List<PersonResponse>> persons(HttpServletRequest request) {
 
         List<PersonResponse> persons = personService.getActivePersons().stream()
-            .map(PersonResponse::new)
+            .map(p -> createPersonResponse(p, request))
             .collect(Collectors.toList());
 
         return new ResponseEntity<>(persons, HttpStatus.OK);
@@ -50,15 +55,25 @@ public class PersonController {
         value = "Get one active person by id", notes = "Get one active person by id"
     )
     @GetMapping(PERSON_URL)
-    public ResponseEntity<PersonResponse> getPerson(@PathVariable Integer id) {
+    public ResponseEntity<PersonResponse> getPerson(@PathVariable Integer id, HttpServletRequest request) {
 
         Optional<Person> person = personService.getPersonByID(id);
         if(person.isPresent()) {
-            return new ResponseEntity<>(new PersonResponse(person.get()), HttpStatus.OK);
+            return new ResponseEntity<>(createPersonResponse(person.get(), request), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
 
-
+    private PersonResponse createPersonResponse(Person person, HttpServletRequest request) {
+        PersonResponse personResponse = new PersonResponse(person);
+        String baseUri = new URIBuilder()
+            .setScheme(request.getScheme())
+            .setPort(request.getServerPort())
+            .setHost(request.getServerName())
+            .setPath(ROOT_URL)
+            .toString();
+        personResponse.add(new Link(baseUri + "/" + person.getId()).withSelfRel());
+        return personResponse;
     }
 }

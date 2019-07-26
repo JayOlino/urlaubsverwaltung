@@ -12,8 +12,7 @@ import org.synyx.urlaubsverwaltung.testdatacreator.TestDataCreator;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -45,7 +44,9 @@ public class PersonControllerTest {
     public void ensureReturnsAllActivePersons() throws Exception {
 
         Person person1 = TestDataCreator.createPerson("foo");
+        person1.setId(1);
         Person person2 = TestDataCreator.createPerson("bar");
+        person2.setId(2);
 
         when(personServiceMock.getActivePersons()).thenReturn(Arrays.asList(person1, person2));
 
@@ -54,8 +55,10 @@ public class PersonControllerTest {
             .andExpect(content().contentType("application/json;charset=UTF-8"))
             .andExpect(jsonPath("$", hasSize(2)))
             .andExpect(jsonPath("$.[0].firstName", is("Foo")))
-            .andExpect(jsonPath("$.[1].lastName", is("Bar")))
-            .andExpect(jsonPath("$.[0].email", is("foo@test.de")));
+            .andExpect(jsonPath("$.[0].links..rel", hasItem("self")))
+            .andExpect(jsonPath("$.[0].links..href", hasItem(endsWith("/api/persons/1"))))
+            .andExpect(jsonPath("$.[0].email", is("foo@test.de")))
+            .andExpect(jsonPath("$.[1].lastName", is("Bar")));
     }
 
     @Test
@@ -71,7 +74,9 @@ public class PersonControllerTest {
             .andExpect(content().contentType("application/json;charset=UTF-8"))
             .andExpect(jsonPath("$.firstName", is("Foo")))
             .andExpect(jsonPath("$.lastName", is("Foo")))
-            .andExpect(jsonPath("$.email", is("foo@test.de")));
+            .andExpect(jsonPath("$.email", is("foo@test.de")))
+            .andExpect(jsonPath("$.links..rel", hasItem("self")))
+            .andExpect(jsonPath("$.links..href", hasItem(endsWith("/api/persons/42"))));
     }
 
 
