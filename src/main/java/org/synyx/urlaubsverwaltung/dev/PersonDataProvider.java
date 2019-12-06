@@ -1,6 +1,6 @@
 package org.synyx.urlaubsverwaltung.dev;
 
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.synyx.urlaubsverwaltung.account.service.AccountInteractionService;
 import org.synyx.urlaubsverwaltung.person.MailNotification;
 import org.synyx.urlaubsverwaltung.person.Person;
@@ -43,49 +43,51 @@ class PersonDataProvider {
     private final PersonService personService;
     private final WorkingTimeService workingTimeService;
     private final AccountInteractionService accountInteractionService;
+    private final PasswordEncoder passwordEncoder;
 
     PersonDataProvider(PersonService personService, WorkingTimeService workingTimeService,
-                       AccountInteractionService accountInteractionService) {
+                       AccountInteractionService accountInteractionService, PasswordEncoder passwordEncoder) {
 
         this.personService = personService;
         this.workingTimeService = workingTimeService;
         this.accountInteractionService = accountInteractionService;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    boolean isPersonAlreadyCreated(String loginName){
+    boolean isPersonAlreadyCreated(String username) {
 
-        final Optional<Person> personByLogin = personService.getPersonByLogin(loginName);
-        return personByLogin.isPresent();
+        final Optional<Person> personByUsername = personService.getPersonByUsername(username);
+        return personByUsername.isPresent();
     }
 
     Person createTestPerson(TestUser testUser, String firstName, String lastName, String email) {
 
-        final String login = testUser.getLogin();
+        final String username = testUser.getUsername();
         final String password = testUser.getPassword();
         final Role[] roles = testUser.getRoles();
 
-        return createTestPerson(login, password, firstName, lastName, email, roles);
+        return createTestPerson(username, password, firstName, lastName, email, roles);
     }
 
-    Person createTestPerson(String login, String password, String firstName, String lastName, String email, Role... roles) {
+    Person createTestPerson(String username, String password, String firstName, String lastName, String email, Role... roles) {
 
 
-        final Optional<Person> personByLogin = personService.getPersonByLogin(login);
-        if (personByLogin.isPresent()) {
-            return personByLogin.get();
+        final Optional<Person> personByUsername = personService.getPersonByUsername(username);
+        if (personByUsername.isPresent()) {
+            return personByUsername.get();
         }
 
         final List<Role> permissions = asList(roles);
         final List<MailNotification> notifications = getNotificationsForRoles(permissions);
 
-        final Person person = personService.create(login, lastName, firstName, email, notifications, permissions);
-        person.setPassword(new StandardPasswordEncoder().encode(password));
+        final Person person = personService.create(username, lastName, firstName, email, notifications, permissions);
+        person.setPassword(passwordEncoder.encode(password));
 
         final Person savedPerson = personService.save(person);
 
         final int currentYear = ZonedDateTime.now(UTC).getYear();
         workingTimeService.touch(
-            asList(MONDAY.getDayOfWeek(), TUESDAY.getDayOfWeek(),WEDNESDAY.getDayOfWeek(), THURSDAY.getDayOfWeek(), FRIDAY.getDayOfWeek()),
+            asList(MONDAY.getDayOfWeek(), TUESDAY.getDayOfWeek(), WEDNESDAY.getDayOfWeek(), THURSDAY.getDayOfWeek(), FRIDAY.getDayOfWeek()),
             Optional.empty(), LocalDate.of(currentYear - 1, 1, 1), savedPerson);
 
         final LocalDate firstDayOfYear = DateUtil.getFirstDayOfYear(currentYear);

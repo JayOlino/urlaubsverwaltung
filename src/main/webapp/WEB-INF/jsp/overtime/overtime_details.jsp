@@ -5,9 +5,12 @@
 <%@taglib prefix="uv" tagdir="/WEB-INF/tags" %>
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="overtime.details.header.title"/>
+    </title>
+    <uv:custom-head/>
 </head>
 <body>
 

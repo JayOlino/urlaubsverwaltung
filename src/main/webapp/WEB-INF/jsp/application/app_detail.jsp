@@ -11,10 +11,13 @@
 <fmt:parseDate value="${application.endDate}" pattern="yyyy-MM-dd" var="parsedEndDate" type="date"/>
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="application.data.header.title" arguments="${application.person.niceName}"/>
+    </title>
+    <uv:custom-head/>
     <script>
         window.uv = {};
         window.uv.personId = '<c:out value="${application.person.id}" />';

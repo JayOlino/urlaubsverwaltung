@@ -16,6 +16,11 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private static final String OFFICE = "OFFICE";
+    private static final String BOSS = "BOSS";
+    private static final String USER = "USER";
+    private static final String ADMIN = "ADMIN";
+
     private boolean isOauth2Enabled;
     private SecurityContextLogoutHandler oidcLogoutHandler;
 
@@ -28,28 +33,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
             .csrf()
-                .disable()
+            .disable()
             .authorizeRequests()
-                // TODO move to common url static or resources
-                .antMatchers("/favicon.ico").permitAll()
-                .antMatchers("/css/**").permitAll()
-                .antMatchers("/fonts/**").permitAll()
-                .antMatchers("/images/**").permitAll()
-                .antMatchers("/assets/**").permitAll()
-                .antMatchers("/login*").permitAll()
-                // WEB
-                .antMatchers("/web/overview").hasAuthority("USER")
-                .antMatchers("/web/application/**").hasAuthority("USER")
-                .antMatchers("/web/sicknote/**").hasAuthority("USER")
-                .antMatchers("/web/person/**").hasAuthority("USER")
-                .antMatchers("/web/overtime/**").hasAuthority("USER")
-                .antMatchers("/web/department/**").hasAnyAuthority("BOSS", "OFFICE")
-                .antMatchers("/web/settings/**").hasAuthority("OFFICE")
-                .antMatchers("/web/google-api-handshake/**").hasAuthority("OFFICE")
-                .requestMatchers(EndpointRequest.to(HealthEndpoint.class)).permitAll()
-                .requestMatchers(EndpointRequest.to(PrometheusScrapeEndpoint.class)).permitAll()
-                // TODO muss konfigurierbar werden!
-                .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAuthority("ADMIN")
+            // TODO move to common url static or resources
+            .antMatchers("/favicons/**").permitAll()
+            .antMatchers("/browserconfig.xml").permitAll()
+            .antMatchers("/manifest.json").permitAll()
+            .antMatchers("/css/**").permitAll()
+            .antMatchers("/fonts/**").permitAll()
+            .antMatchers("/images/**").permitAll()
+            .antMatchers("/assets/**").permitAll()
+            .antMatchers("/login*").permitAll()
+            // WEB
+            .antMatchers("/web/overview").hasAuthority(USER)
+            .antMatchers("/web/application/**").hasAuthority(USER)
+            .antMatchers("/web/sicknote/**").hasAuthority(USER)
+            .antMatchers("/web/person/**").hasAuthority(USER)
+            .antMatchers("/web/overtime/**").hasAuthority(USER)
+            .antMatchers("/web/department/**").hasAnyAuthority(BOSS, OFFICE)
+            .antMatchers("/web/settings/**").hasAuthority(OFFICE)
+            .antMatchers("/web/google-api-handshake/**").hasAuthority(OFFICE)
+            .requestMatchers(EndpointRequest.to(HealthEndpoint.class)).permitAll()
+            .requestMatchers(EndpointRequest.to(PrometheusScrapeEndpoint.class)).permitAll()
+            // TODO muss konfigurierbar werden!
+            .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAuthority(ADMIN)
             .anyRequest()
             .authenticated();
 

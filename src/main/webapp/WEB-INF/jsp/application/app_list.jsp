@@ -29,10 +29,13 @@
 <c:set var="CAN_ALLOW" value="${IS_BOSS || IS_DEPARTMENT_HEAD || IS_SECOND_STAGE_AUTHORITY}"/>
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="applications.header.title"/>
+    </title>
+    <uv:custom-head/>
     <script defer src="<asset:url value='app_list.js' />"></script>
 </head>
 
@@ -102,7 +105,7 @@
 
                     <c:otherwise>
 
-                        <table class="list-table selectable-table" cellspacing="0">
+                        <table class="list-table selectable-table">
                             <tbody>
                             <c:forEach items="${applications}" var="application" varStatus="loopStatus">
                                 <tr class="active" onclick="navigate('${URL_PREFIX}/application/${application.id}');">

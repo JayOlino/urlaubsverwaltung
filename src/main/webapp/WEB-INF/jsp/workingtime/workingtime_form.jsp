@@ -7,9 +7,12 @@
 <%@taglib prefix="asset" uri = "/WEB-INF/asset.tld"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="person.form.workingTime.header.title" arguments="${person.niceName}"/>
+    </title>
+    <uv:custom-head/>
     <script defer src="<asset:url value='workingtime_form.js' />"></script>
 </head>
 

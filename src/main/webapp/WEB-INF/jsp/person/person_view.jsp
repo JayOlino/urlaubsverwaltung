@@ -8,12 +8,15 @@
 
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 
 <spring:url var="URL_PREFIX" value="/web"/>
 
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="person.overview.header.title"/>
+    </title>
+    <uv:custom-head/>
     <c:if test="${not empty persons}">
     <script defer src="<asset:url value='npm.tablesorter.js' />"></script>
     <script defer src="<asset:url value='npm.list.js.js' />"></script>
@@ -44,7 +47,7 @@
                             <c:choose>
                                 <c:when test="${param.active}">
                                     <c:choose>
-                                        <c:when test="${param.department != null}">
+                                        <c:when test="${department != null}">
                                             <c:out value="${department.name}"/><span class="caret"></span>
                                         </c:when>
                                         <c:otherwise>
@@ -89,13 +92,14 @@
 
                     <uv:print/>
 
-                    <sec:authorize access="hasAuthority('OFFICE')">
-                        <a href="${URL_PREFIX}/person/new" class="fa-action pull-right" aria-hidden="true"
-                           data-title="<spring:message code="action.person.create"/>">
-                            <i class="fa fa-fw fa-user-plus" aria-hidden="true"></i>
-                        </a>
-                    </sec:authorize>
-
+                    <c:if test="${userCanBeManipulated}">
+                        <sec:authorize access="hasAuthority('OFFICE')">
+                            <a href="${URL_PREFIX}/person/new" class="fa-action pull-right" aria-hidden="true"
+                               data-title="<spring:message code="action.person.create"/>">
+                                <i class="fa fa-fw fa-user-plus" aria-hidden="true"></i>
+                            </a>
+                        </sec:authorize>
+                    </c:if>
                 </legend>
 
                 <c:choose>

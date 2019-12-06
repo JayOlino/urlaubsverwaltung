@@ -1,12 +1,9 @@
 package org.synyx.urlaubsverwaltung.application.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.synyx.urlaubsverwaltung.period.DayLength;
 import org.synyx.urlaubsverwaltung.period.Period;
 import org.synyx.urlaubsverwaltung.person.Person;
-import org.synyx.urlaubsverwaltung.util.DateFormat;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,7 +14,6 @@ import java.math.BigDecimal;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 import static java.time.ZoneOffset.UTC;
 
@@ -57,7 +53,7 @@ public class Application extends AbstractPersistable<Integer> {
     /**
      * Flag for two stage approval process.
      *
-     * @since  2.15.0
+     * @since 2.15.0
      */
     private boolean twoStageApproval;
 
@@ -69,7 +65,7 @@ public class Application extends AbstractPersistable<Integer> {
     /**
      * Start time of the application for leave.
      *
-     * @since  2.15.0
+     * @since 2.15.0
      */
     private Time startTime;
 
@@ -81,7 +77,7 @@ public class Application extends AbstractPersistable<Integer> {
     /**
      * End time of the application for leave.
      *
-     * @since  2.15.0
+     * @since 2.15.0
      */
     private Time endTime;
 
@@ -148,7 +144,7 @@ public class Application extends AbstractPersistable<Integer> {
     /**
      * The number of overtime hours that are used for this application for leave.
      *
-     * @since  2.11.0
+     * @since 2.11.0
      */
     private BigDecimal hours;
 
@@ -182,11 +178,7 @@ public class Application extends AbstractPersistable<Integer> {
 
     public void setApplicationDate(LocalDate applicationDate) {
 
-        if (applicationDate == null) {
-            this.applicationDate = null;
-        } else {
-            this.applicationDate = applicationDate;
-        }
+        this.applicationDate = applicationDate;
     }
 
 
@@ -202,11 +194,7 @@ public class Application extends AbstractPersistable<Integer> {
 
     public void setCancelDate(LocalDate cancelDate) {
 
-        if (cancelDate == null) {
-            this.cancelDate = null;
-        } else {
-            this.cancelDate = cancelDate;
-        }
+        this.cancelDate = cancelDate;
     }
 
 
@@ -222,11 +210,7 @@ public class Application extends AbstractPersistable<Integer> {
 
     public void setEditedDate(LocalDate editedDate) {
 
-        if (editedDate == null) {
-            this.editedDate = null;
-        } else {
-            this.editedDate = editedDate;
-        }
+        this.editedDate = editedDate;
     }
 
 
@@ -290,11 +274,7 @@ public class Application extends AbstractPersistable<Integer> {
 
     public void setEndDate(LocalDate endDate) {
 
-        if (endDate == null) {
-            this.endDate = null;
-        } else {
-            this.endDate = endDate;
-        }
+        this.endDate = endDate;
     }
 
 
@@ -382,11 +362,7 @@ public class Application extends AbstractPersistable<Integer> {
 
     public void setStartDate(LocalDate startDate) {
 
-        if (startDate == null) {
-            this.startDate = null;
-        } else {
-            this.startDate = startDate;
-        }
+        this.startDate = startDate;
     }
 
 
@@ -432,11 +408,7 @@ public class Application extends AbstractPersistable<Integer> {
 
     public void setRemindDate(LocalDate remindDate) {
 
-        if (remindDate == null) {
-            this.remindDate = null;
-        } else {
-            this.remindDate = remindDate;
-        }
+        this.remindDate = remindDate;
     }
 
 
@@ -463,44 +435,38 @@ public class Application extends AbstractPersistable<Integer> {
         this.hours = hours;
     }
 
-
     @Override
     public String toString() {
-
-        ToStringBuilder toStringBuilder = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
-        toStringBuilder.append("id", getId());
-        toStringBuilder.append("startDate", getStartDate().format(DateTimeFormatter.ofPattern(DateFormat.PATTERN)));
-        toStringBuilder.append("endDate", getEndDate().format(DateTimeFormatter.ofPattern(DateFormat.PATTERN)));
-        toStringBuilder.append("vacationType", getVacationType());
-        toStringBuilder.append("twoStageApproval", isTwoStageApproval());
-        toStringBuilder.append("status", getStatus().toString());
-        toStringBuilder.append("dayLength", getDayLength());
-
-        if (getPerson() != null && getApplier() != null && getPerson().equals(getApplier())) {
-            toStringBuilder.append("person", getPerson());
-        } else {
-            toStringBuilder.append("person", getPerson());
-            toStringBuilder.append("applier", getApplier());
-        }
-
-        if (getBoss() != null) {
-            toStringBuilder.append("boss", getBoss());
-        }
-
-        if (getCanceller() != null) {
-            toStringBuilder.append("canceller", getCanceller());
-        }
-
-        return toStringBuilder.toString();
+        return "Application{" +
+            "person=" + person +
+            ", applier=" + applier +
+            ", boss=" + boss +
+            ", canceller=" + canceller +
+            ", twoStageApproval=" + twoStageApproval +
+            ", startDate=" + startDate +
+            ", startTime=" + startTime +
+            ", endDate=" + endDate +
+            ", endTime=" + endTime +
+            ", vacationType=" + vacationType +
+            ", dayLength=" + dayLength +
+            ", reason='" + reason + '\'' +
+            ", holidayReplacement=" + holidayReplacement +
+            ", address='" + address + '\'' +
+            ", applicationDate=" + applicationDate +
+            ", cancelDate=" + cancelDate +
+            ", editedDate=" + editedDate +
+            ", remindDate=" + remindDate +
+            ", status=" + status +
+            ", teamInformed=" + teamInformed +
+            ", hours=" + hours +
+            '}';
     }
-
 
     /**
      * Checks if the application for leave has the given status.
      *
-     * @param  status  to be checked
-     *
-     * @return  {@code true} if the application for leave has the given status, else {@code false}
+     * @param status to be checked
+     * @return {@code true} if the application for leave has the given status, else {@code false}
      */
     public boolean hasStatus(ApplicationStatus status) {
 
@@ -511,7 +477,7 @@ public class Application extends AbstractPersistable<Integer> {
     /**
      * Return period of time of the application for leave.
      *
-     * @return  period of time, never {@code null}
+     * @return period of time, never {@code null}
      */
     public Period getPeriod() {
 
@@ -522,7 +488,7 @@ public class Application extends AbstractPersistable<Integer> {
     /**
      * Get start of application for leave as date with time.
      *
-     * @return  start date with time or {@code null} if start date or start time is missing
+     * @return start date with time or {@code null} if start date or start time is missing
      */
     public ZonedDateTime getStartDateWithTime() {
 
@@ -540,7 +506,7 @@ public class Application extends AbstractPersistable<Integer> {
     /**
      * Get end of application for leave as date with time.
      *
-     * @return  end date with time or {@code null} if end date or end time is missing
+     * @return end date with time or {@code null} if end date or end time is missing
      */
     public ZonedDateTime getEndDateWithTime() {
 

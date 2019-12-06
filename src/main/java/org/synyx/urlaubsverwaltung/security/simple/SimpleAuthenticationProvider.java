@@ -8,19 +8,20 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.synyx.urlaubsverwaltung.person.Person;
 import org.synyx.urlaubsverwaltung.person.PersonService;
 import org.synyx.urlaubsverwaltung.person.Role;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.invoke.MethodHandles.lookup;
+import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import static org.synyx.urlaubsverwaltung.person.Role.INACTIVE;
 
 /**
  * Provides authentication with password, which is saved in database.
@@ -30,49 +31,47 @@ public class SimpleAuthenticationProvider implements AuthenticationProvider {
     private static final Logger LOG = getLogger(lookup().lookupClass());
 
     private final PersonService personService;
+    private final PasswordEncoder passwordEncoder;
 
-    SimpleAuthenticationProvider(PersonService personService) {
+    SimpleAuthenticationProvider(PersonService personService, PasswordEncoder passwordEncoder) {
 
         this.personService = personService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) {
+    public Authentication authenticate(final Authentication authentication) {
 
-        // TODO replace StandardPasswordEncoder
+        final String providedUsername = authentication.getName();
 
-        StandardPasswordEncoder encoder = new StandardPasswordEncoder();
-
-        String username = authentication.getName();
-        String rawPassword = authentication.getCredentials().toString();
-
-        Optional<Person> userOptional = personService.getPersonByLogin(username);
-
+        final Optional<Person> userOptional = personService.getPersonByUsername(providedUsername);
         if (userOptional.isEmpty()) {
-            LOG.info("No user found for username '{}'", username);
-
-            throw new UsernameNotFoundException("No authentication possible for user = " + username);
+            final String cleanedProvidedUsername = providedUsername.replaceAll("[\n|\r|\t]", "_");
+            LOG.info("No user found for provided username '{}'", cleanedProvidedUsername);
+            throw new UsernameNotFoundException("No authentication possible for user = " + cleanedProvidedUsername);
         }
 
-        Person person = userOptional.get();
+        final Person person = userOptional.get();
 
-        if (person.hasRole(Role.INACTIVE)) {
-            LOG.info("User '{}' has been deactivated and can not sign in therefore", username);
-            throw new DisabledException("User '" + username + "' has been deactivated");
+        if (person.hasRole(INACTIVE)) {
+            LOG.info("User '{}' has been deactivated and can not sign in therefore", person.getId());
+            throw new DisabledException("User with the id '" + person.getId() + "' has been deactivated");
         }
 
-        Collection<Role> permissions = person.getPermissions();
-        Collection<GrantedAuthority> grantedAuthorities = permissions.stream().map(role ->
-            new SimpleGrantedAuthority(role.name())).collect(Collectors.toList());
+        final Collection<Role> permissions = person.getPermissions();
+        final Collection<GrantedAuthority> grantedAuthorities = permissions.stream()
+            .map(role -> new SimpleGrantedAuthority(role.name()))
+            .collect(toList());
 
-        String userPassword = person.getPassword();
+        final String providedPassword = authentication.getCredentials().toString();
+        final String userPassword = person.getPassword();
 
-        if (encoder.matches(rawPassword, userPassword)) {
-            LOG.info("User '{}' has signed in with roles: {}", username, grantedAuthorities);
+        if (passwordEncoder.matches(providedPassword, userPassword)) {
+            LOG.info("User '{}' has signed in with roles: {}", person.getId(), grantedAuthorities);
 
-            return new UsernamePasswordAuthenticationToken(username, userPassword, grantedAuthorities);
+            return new UsernamePasswordAuthenticationToken(new User(person.getUsername(), userPassword, grantedAuthorities), userPassword, grantedAuthorities);
         } else {
-            LOG.info("User '{}' has tried to sign in with a wrong password", username);
+            LOG.info("User '{}' has tried to sign in with a wrong password", person.getId());
 
             throw new BadCredentialsException("The provided password is wrong");
         }

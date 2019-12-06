@@ -6,10 +6,13 @@
 
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="errorPage.header.title"/>
+    </title>
+    <uv:custom-head/>
 </head>
 
 <body>

@@ -26,9 +26,8 @@ public class ExceptionHandlerControllerAdvice {
     /**
      * Get the common error page.
      *
-     * @param  exception  has information about cause of error
-     *
-     * @return  the error page as {@link ModelAndView}
+     * @param exception has information about cause of error
+     * @return the error page as {@link ModelAndView}
      */
     private static ModelAndView getErrorPage(Exception exception, HttpStatus httpStatus) {
 
@@ -42,13 +41,12 @@ public class ExceptionHandlerControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(
-        { AbstractNoResultFoundException.class, NumberFormatException.class }
+        {AbstractNoResultFoundException.class, NumberFormatException.class}
     )
     public ModelAndView handleException(AbstractNoResultFoundException exception) {
 
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("An exception was thrown: {}", exception.getClass().getName());
-            LOG.debug("An error occurred: {}", exception.getMessage());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("An exception was thrown", exception);
         }
         return ExceptionHandlerControllerAdvice.getErrorPage(exception, HttpStatus.BAD_REQUEST);
     }
@@ -58,9 +56,8 @@ public class ExceptionHandlerControllerAdvice {
     @ExceptionHandler(AccessDeniedException.class)
     public ModelAndView handleException(AccessDeniedException exception) {
 
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("An exception was thrown: {}", exception.getClass().getName());
-            LOG.debug("An error occurred: {}", exception.getMessage());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("An exception was thrown", exception);
         }
         return ExceptionHandlerControllerAdvice.getErrorPage(exception, HttpStatus.FORBIDDEN);
     }
@@ -70,8 +67,7 @@ public class ExceptionHandlerControllerAdvice {
     @ExceptionHandler(Exception.class)
     public ModelAndView handleException(Exception exception) {
 
-        LOG.info("An exception was thrown: {}", exception.getClass().getName());
-        LOG.info("An error occurred: {}", exception.getMessage());
+        LOG.warn("An exception was thrown", exception);
 
         return ExceptionHandlerControllerAdvice.getErrorPage(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }

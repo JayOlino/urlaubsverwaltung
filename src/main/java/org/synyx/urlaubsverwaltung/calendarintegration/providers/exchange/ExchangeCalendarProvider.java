@@ -30,11 +30,12 @@ import org.synyx.urlaubsverwaltung.settings.ExchangeCalendarSettings;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
-import java.sql.Date;
 import java.util.Optional;
 import java.util.TimeZone;
 
+import static java.lang.String.format;
 import static java.lang.invoke.MethodHandles.lookup;
+import static java.util.Date.from;
 import static org.slf4j.LoggerFactory.getLogger;
 
 
@@ -92,7 +93,7 @@ public class ExchangeCalendarProvider implements CalendarProvider {
             }
 
             LOG.info("Appointment {} for '{}' added to exchange calendar '{}'.", appointment.getId(),
-                absence.getPerson().getNiceName(), calendarName);
+                absence.getPerson().getId(), calendarName);
 
             return Optional.ofNullable(appointment.getId().getUniqueId());
         } catch (Exception ex) { // NOSONAR - EWS Java API throws Exception, that's life
@@ -111,9 +112,8 @@ public class ExchangeCalendarProvider implements CalendarProvider {
 
         String[] emailPart = email.split("[@._]");
         if (emailPart.length < 2) {
-            LOG.warn(String.format(
-                "No connection could be established to the Exchange calendar for email=%s, cause=%s", email,
-                "email-address is not valid (expected form: name@domain)"));
+            LOG.warn("No connection could be established to the Exchange calendar for email={}, cause={}",
+                email, "email-address is not valid (expected form: name@domain)");
             return;
         }
         String username = emailPart[0];
@@ -201,7 +201,7 @@ public class ExchangeCalendarProvider implements CalendarProvider {
 
             return CalendarFolder.bind(exchangeService, folder.getId());
         } catch (Exception ex) { // NOSONAR - EWS Java API throws Exception, that's life
-            throw new CalendarNotCreatedException(String.format("Exchange calendar '%s' could not be created",
+            throw new CalendarNotCreatedException(format("Exchange calendar '%s' could not be created",
                 calendarName), ex);
         }
     }
@@ -215,9 +215,9 @@ public class ExchangeCalendarProvider implements CalendarProvider {
 
         OlsonTimeZoneDefinition timeZone = new OlsonTimeZoneDefinition(TimeZone.getTimeZone(exchangeTimeZoneId));
 
-        appointment.setStart(Date.from(absence.getStartDate().toInstant()));
+        appointment.setStart(from(absence.getStartDate().toInstant()));
         appointment.setStartTimeZone(timeZone);
-        appointment.setEnd(Date.from(absence.getEndDate().toInstant()));
+        appointment.setEnd(from(absence.getEndDate().toInstant()));
         appointment.setEndTimeZone(timeZone);
 
         appointment.setIsAllDayEvent(absence.isAllDay());

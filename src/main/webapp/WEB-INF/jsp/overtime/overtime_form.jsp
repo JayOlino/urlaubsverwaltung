@@ -6,9 +6,19 @@
 <%@taglib prefix="asset" uri = "/WEB-INF/asset.tld"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 <head>
-    <uv:head/>
+    <title>
+        <c:choose>
+            <c:when test="${overtime.id == null}">
+                <spring:message code="overtime.record.header.title.new"/>
+            </c:when>
+            <c:otherwise>
+                <spring:message code="overtime.record.header.title.edit"/>
+            </c:otherwise>
+        </c:choose>
+    </title>
+    <uv:custom-head/>
     <script>
         window.uv = {};
         window.uv.personId = '<c:out value="${person.id}" />';

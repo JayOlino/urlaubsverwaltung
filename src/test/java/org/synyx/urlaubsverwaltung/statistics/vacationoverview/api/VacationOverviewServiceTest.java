@@ -54,7 +54,7 @@ public class VacationOverviewServiceTest {
         when(publicHolidayService.getWorkingDurationOfDate(ArgumentMatchers.any(LocalDate.class), ArgumentMatchers.any(FederalState.class))).thenReturn(DayLength.FULL.getDuration());
 
         List<VacationOverview> vacationOverviews =
-                sut.getVacationOverviews(departmentName, testDate.getYear(), testDate.getMonthValue());
+            sut.getVacationOverviews(departmentName, testDate.getYear(), testDate.getMonthValue());
 
         assertThat(vacationOverviews, Matchers.hasSize(1));
         assertThat(vacationOverviews.get(0).getPerson().getEmail(), Is.is(email));

@@ -1,8 +1,45 @@
 ### master
+* Configuration-Change: `uv.person.canBeManipulated` is now `false` by default [#880](https://github.com/synyx/urlaubsverwaltung/pull/880)
+* Fix logging of user data on google calendar event [#875](https://github.com/synyx/urlaubsverwaltung/pull/875)
+
+### [urlaubsverwaltung-3.0.0.RC8](https://github.com/synyx/urlaubsverwaltung/releases/tag/urlaubsverwaltung-3.0.0.RC8)
+* API-Change: Move `api/availability` to `api/person/persons/{personId}/availabilities` [#808](https://github.com/synyx/urlaubsverwaltung/issues/808)
+* Add thuringia childrens day holiday [#790](https://github.com/synyx/urlaubsverwaltung/pull/790)
+* Add default workdays to the configuration properties [#828](https://github.com/synyx/urlaubsverwaltung/pull/828)
+* Add the correct locale to as html element attribute [#856](https://github.com/synyx/urlaubsverwaltung/pull/856)
+* Add scope attribute to th to define col or row [#857](https://github.com/synyx/urlaubsverwaltung/pull/857)
+* Add favicons for all types of devices [#819](https://github.com/synyx/urlaubsverwaltung/pull/819)
+* Allow user to get their own data via the api [#825](https://github.com/synyx/urlaubsverwaltung/pull/825)
+* Fix missing absence entries in availabilities api [#829](https://github.com/synyx/urlaubsverwaltung/pull/829)
+* Fix broken selector label on persons page [#860](https://github.com/synyx/urlaubsverwaltung/pull/860)
+* Fix user can be manipulated [#822](https://github.com/synyx/urlaubsverwaltung/pull/822)
+* Rename loginName to username [#839](https://github.com/synyx/urlaubsverwaltung/pull/839)
+* Rename to view controller test [#814](https://github.com/synyx/urlaubsverwaltung/pull/814)
+* Remove all deprecations [#841](https://github.com/synyx/urlaubsverwaltung/pull/841)
+* Upgrade spring boot parent to 2.1.11
+* Upgrade google api client to 1.25.0
+* Upgrade jollyday to 0.5.9
+* Upgrade frontend maven plugin to 1.8.0
+* Upgrade maven wrapper to 3.6.3
+
+### [urlaubsverwaltung-3.0.0.RC7](https://github.com/synyx/urlaubsverwaltung/releases/tag/urlaubsverwaltung-3.0.0.RC7)
+* Remove liquibase user demo creation on demo context [#810](https://github.com/synyx/urlaubsverwaltung/pull/810)
+
+### [urlaubsverwaltung-3.0.0.RC6](https://github.com/synyx/urlaubsverwaltung/releases/tag/urlaubsverwaltung-3.0.0.RC6)
+* Introduce application.properties based mail configuration [#634](https://github.com/synyx/urlaubsverwaltung/pull/634)
+* Add ability to create new user with default working days and vacation days [#365](https://github.com/synyx/urlaubsverwaltung/issues/365) [#805](https://github.com/synyx/urlaubsverwaltung/pull/805)
+* Add possibility to disable new user creation [#807](https://github.com/synyx/urlaubsverwaltung/pull/807)
+
+### [urlaubsverwaltung-3.0.0.RC5](https://github.com/synyx/urlaubsverwaltung/releases/tag/urlaubsverwaltung-3.0.0.RC5)
 * Fix broken link in department overview [#749](https://github.com/synyx/urlaubsverwaltung/pull/749)
 * Fix highlight current day on vacation request [#751](https://github.com/synyx/urlaubsverwaltung/pull/751)
+* Decouple auth from api [#759](https://github.com/synyx/urlaubsverwaltung/pull/759)
+* API-Change: `api/availability` now uses `personId` instead of `loginName`. The id of a person can be discovered via `api/person` [736](https://github.com/synyx/urlaubsverwaltung/issues/736)
 * ❗Security-Fix: Activate method security for @Pre and @PostAuthorize [#761](https://github.com/synyx/urlaubsverwaltung/pull/761)
+* Secure Api Access [#695](https://github.com/synyx/urlaubsverwaltung/pull/695)
 * Upgrade spring boot parent to 2.1.7
+* Upgrade NodeJS to 12
+* Upgrade date-fns from 1.x to 2.0.1
 
 ### [urlaubsverwaltung-3.0.0.RC4](https://github.com/synyx/urlaubsverwaltung/releases/tag/urlaubsverwaltung-3.0.0.RC4)
 * Fix login parameter security

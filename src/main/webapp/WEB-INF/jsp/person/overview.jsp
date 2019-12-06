@@ -8,10 +8,13 @@
 <%@taglib prefix="asset" uri = "/WEB-INF/asset.tld"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="overview.header.title" arguments="${person.niceName}, ${year}"/>
+    </title>
+    <uv:custom-head/>
     <link rel="stylesheet" type="text/css" href="<asset:url value='app_form~overtime_form~person_overview~sick_note_form.css' />" />
     <script>
         window.uv = {};
@@ -29,6 +32,7 @@
 </head>
 
 <body>
+
 <spring:url var="URL_PREFIX" value="/web"/>
 
 <sec:authorize access="hasAuthority('OFFICE')">

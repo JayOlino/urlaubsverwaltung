@@ -1,7 +1,5 @@
 package org.synyx.urlaubsverwaltung.sicknote;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.synyx.urlaubsverwaltung.period.DayLength;
 import org.synyx.urlaubsverwaltung.period.Period;
@@ -35,7 +33,7 @@ public class SickNote extends AbstractPersistable<Integer> {
     /**
      * Type of sick note.
      *
-     * @since  2.15.0
+     * @since 2.15.0
      */
     @ManyToOne
     private SickNoteType sickNoteType;
@@ -50,7 +48,7 @@ public class SickNote extends AbstractPersistable<Integer> {
     /**
      * Time of day for the sick note: morning, noon or full day
      *
-     * @since  2.9.4
+     * @since 2.9.4
      */
     @Enumerated(EnumType.STRING)
     private DayLength dayLength;
@@ -108,11 +106,7 @@ public class SickNote extends AbstractPersistable<Integer> {
 
     public void setStartDate(LocalDate startDate) {
 
-        if (startDate == null) {
-            this.startDate = null;
-        } else {
-            this.startDate = startDate;
-        }
+        this.startDate = startDate;
     }
 
 
@@ -128,11 +122,7 @@ public class SickNote extends AbstractPersistable<Integer> {
 
     public void setEndDate(LocalDate endDate) {
 
-        if (endDate == null) {
-            this.endDate = null;
-        } else {
-            this.endDate = endDate;
-        }
+        this.endDate = endDate;
     }
 
 
@@ -166,11 +156,7 @@ public class SickNote extends AbstractPersistable<Integer> {
 
     public void setAubStartDate(LocalDate aubStartDate) {
 
-        if (aubStartDate == null) {
-            this.aubStartDate = null;
-        } else {
-            this.aubStartDate = aubStartDate;
-        }
+        this.aubStartDate = aubStartDate;
     }
 
 
@@ -186,11 +172,7 @@ public class SickNote extends AbstractPersistable<Integer> {
 
     public void setAubEndDate(LocalDate aubEndDate) {
 
-        if (aubEndDate == null) {
-            this.aubEndDate = null;
-        } else {
-            this.aubEndDate = aubEndDate;
-        }
+        this.aubEndDate = aubEndDate;
     }
 
 
@@ -206,11 +188,7 @@ public class SickNote extends AbstractPersistable<Integer> {
 
     public void setLastEdited(LocalDate lastEdited) {
 
-        if (lastEdited == null) {
-            this.lastEdited = null;
-        } else {
-            this.lastEdited = lastEdited;
-        }
+        this.lastEdited = lastEdited;
     }
 
 
@@ -244,18 +222,20 @@ public class SickNote extends AbstractPersistable<Integer> {
         super.setId(id);
     }
 
-
     @Override
     public String toString() {
-
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).append("id", getId())
-            .append("startDate", formatNullable(getStartDate()))
-            .append("endDate", formatNullable(getEndDate()))
-            .append("dayLength", getDayLength())
-            .append("sickNoteType", getSickNoteType())
-            .append("status", getStatus())
-            .append("person", getPerson())
-            .toString();
+        return "SickNote{" +
+            "id=" + getId() +
+            ", person=" + person +
+            ", sickNoteType=" + sickNoteType +
+            ", startDate=" + startDate +
+            ", endDate=" + endDate +
+            ", dayLength=" + dayLength +
+            ", aubStartDate=" + aubStartDate +
+            ", aubEndDate=" + aubEndDate +
+            ", lastEdited=" + lastEdited +
+            ", status=" + status +
+            '}';
     }
 
     private Object formatNullable(LocalDate date) {

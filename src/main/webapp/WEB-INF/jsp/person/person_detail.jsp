@@ -5,12 +5,15 @@
 <%@taglib prefix="uv" tagdir="/WEB-INF/tags" %>
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 
 <spring:url var="URL_PREFIX" value="/web"/>
 
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="person.details.header.title" arguments="${person.niceName}"/>
+    </title>
+    <uv:custom-head/>
 </head>
 
 <body>

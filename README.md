@@ -1,3 +1,4 @@
+[![GitHub Actions Build Status](https://github.com/synyx/urlaubsverwaltung/workflows/Urlaubsverwaltung%20CI/badge.svg)](https://github.com/synyx/urlaubsverwaltung/actions?query=workflow%3A%22Urlaubsverwaltung+CI%22)
 [![Build Status](https://img.shields.io/travis/synyx/urlaubsverwaltung.svg)](https://travis-ci.org/synyx/urlaubsverwaltung)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=org.synyx:urlaubsverwaltung&metric=coverage)](https://sonarcloud.io/dashboard?id=org.synyx:urlaubsverwaltung)
 [![Docker Pulls](https://img.shields.io/docker/pulls/synyx/urlaubsverwaltung.svg)](https://hub.docker.com/r/synyx/urlaubsverwaltung)
@@ -170,9 +171,13 @@ Die Testdaten enthalten folgende Nutzer:
 
 ### Aufrufen der Anwendung
 
-Die Anwendung ist nun erreichbar unter
+Folgende systeme sind erreichbar
 
-`<servername>:8080/`
+| Service                   | Port    |
+| ------------------------- | ------- |
+| Urlaubsverwaltung         | 8080    |
+| Mailhog                   | 8025    |
+| Mailhog SMTP              | 1025    |
 
 ## Produktivbetrieb
 

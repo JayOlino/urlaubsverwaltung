@@ -7,9 +7,17 @@
 <%@taglib prefix="asset" uri = "/WEB-INF/asset.tld"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
+
+<c:set var="SICK_NOTE_MESSAGEKEY">
+    <spring:message code='${sickNote.sickNoteType.messageKey}'/>
+</c:set>
+
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="sicknote.header.title" arguments="${SICK_NOTE_MESSAGEKEY}, ${sickNote.person.niceName}"/>
+    </title>
+    <uv:custom-head/>
     <script defer src="<asset:url value='sick_note.js' />"></script>
 </head>
 <body>
@@ -90,9 +98,6 @@
                     <span class="box-text">
                         <h5 class="is-inline-block is-sticky"><c:out value="${sickNote.person.niceName}"/></h5>
 
-                        <c:set var="SICK_NOTE_MESSAGEKEY">
-                            <spring:message code='${sickNote.sickNoteType.messageKey}'/>
-                        </c:set>
                         <spring:message code="sicknotes.details.title" arguments="${SICK_NOTE_MESSAGEKEY}"/>
 
                         <c:choose>

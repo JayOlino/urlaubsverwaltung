@@ -11,6 +11,7 @@ import org.synyx.urlaubsverwaltung.web.FilterPeriod;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -32,25 +33,25 @@ class ApplicationForLeaveStatisticsCsvExportServiceImpl implements ApplicationFo
 
     @Override
     public void writeStatistics(FilterPeriod period, List<ApplicationForLeaveStatistics> statistics, CSVWriter csvWriter) {
-        final String[] csvHeader = { getTranslation("person.data.firstName", "Vorname"),
-                getTranslation("person.data.lastName", "Nachname"), "",
-                getTranslation("applications.statistics.allowed", "genehmigt"),
-                getTranslation("applications.statistics.waiting", "noch nicht genehmigt"),
-                getTranslation("applications.statistics.left", "verbleibend") + " (" + period.getStartDate().getYear() + ")", "" };
+        final String[] csvHeader = {getTranslation("person.data.firstName", "Vorname"),
+            getTranslation("person.data.lastName", "Nachname"), "",
+            getTranslation("applications.statistics.allowed", "genehmigt"),
+            getTranslation("applications.statistics.waiting", "noch nicht genehmigt"),
+            getTranslation("applications.statistics.left", "verbleibend") + " (" + period.getStartDate().getYear() + ")", ""};
 
-        final String[] csvSubHeader = { "", "", "", "", "", getTranslation("duration.vacationDays", "Urlaubstage"),
-                getTranslation("duration.overtime", "Überstunden") };
+        final String[] csvSubHeader = {"", "", "", "", "", getTranslation("duration.vacationDays", "Urlaubstage"),
+            getTranslation("duration.overtime", "Überstunden")};
 
         String headerNote = getTranslation("absence.period", "Zeitraum") + ": " + period.getStartDateAsString() + " - "
-                + period.getEndDateAsString();
+            + period.getEndDateAsString();
 
-        DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(LOCALE);
+        DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(LOCALE);
         DecimalFormatSymbols newSymbols = new DecimalFormatSymbols(LOCALE);
         newSymbols.setDecimalSeparator(',');
         newSymbols.setGroupingSeparator('.');
         decimalFormat.setDecimalFormatSymbols(newSymbols);
 
-        csvWriter.writeNext(new String[] { headerNote });
+        csvWriter.writeNext(new String[]{headerNote});
         csvWriter.writeNext(csvHeader);
         csvWriter.writeNext(csvSubHeader);
 
@@ -76,9 +77,9 @@ class ApplicationForLeaveStatisticsCsvExportServiceImpl implements ApplicationFo
 
                 csvRowVacationTypes[2] = getTranslation(type.getMessageKey());
                 csvRowVacationTypes[3] = decimalFormat
-                        .format(applicationForLeaveStatistics.getAllowedVacationDays().get(type));
+                    .format(applicationForLeaveStatistics.getAllowedVacationDays().get(type));
                 csvRowVacationTypes[4] = decimalFormat
-                        .format(applicationForLeaveStatistics.getWaitingVacationDays().get(type));
+                    .format(applicationForLeaveStatistics.getWaitingVacationDays().get(type));
 
                 csvWriter.writeNext(csvRowVacationTypes);
             }
@@ -89,9 +90,9 @@ class ApplicationForLeaveStatisticsCsvExportServiceImpl implements ApplicationFo
     @Override
     public String getFileName(FilterPeriod period) {
         return String.format("%s_%s_%s.csv",
-                getTranslation("applications.statistics", "Statistik"),
-                period.getStartDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT)),
-                period.getEndDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT)));
+            getTranslation("applications.statistics", "Statistik"),
+            period.getStartDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT)),
+            period.getEndDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT)));
     }
 
     private String getTranslation(String key, Object... args) {

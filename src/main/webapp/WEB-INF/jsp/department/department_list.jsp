@@ -8,10 +8,13 @@
 <%@taglib prefix="asset" uri = "/WEB-INF/asset.tld"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="departments.header.title"/>
+    </title>
+    <uv:custom-head/>
     <script defer src="<asset:url value='npm.tablesorter.js' />"></script>
     <script defer src="<asset:url value='department_list.js' />"></script>
     <spring:url var="URL_PREFIX" value="/web"/>
@@ -71,15 +74,15 @@
                         <spring:message code="departments.none"/>
                     </c:when>
                     <c:otherwise>
-                        <table cellspacing="0" class="list-table sortable tablesorter">
+                        <table class="list-table sortable tablesorter">
                             <thead class="hidden-xs hidden-sm">
                             <tr>
-                                <th class="sortable-field"><spring:message code="department.data.name"/></th>
-                                <th class="sortable-field"><spring:message code="department.members"/></th>
-                                <th class="sortable-field"><spring:message
+                                <th scope="col" class="sortable-field"><spring:message code="department.data.name"/></th>
+                                <th scope="col" class="sortable-field"><spring:message code="department.members"/></th>
+                                <th scope="col" class="sortable-field"><spring:message
                                     code='department.data.lastModification'/></th>
                                 <sec:authorize access="hasAuthority('OFFICE')">
-                                    <th><%-- placeholder to ensure correct number of th --%></th>
+                                    <th scope="col"><%-- placeholder to ensure correct number of th --%></th>
                                 </sec:authorize>
                             </tr>
                             </thead>

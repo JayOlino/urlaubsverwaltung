@@ -1,5 +1,6 @@
 package org.synyx.urlaubsverwaltung.person;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,12 +10,19 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.synyx.urlaubsverwaltung.account.service.AccountInteractionService;
+import org.synyx.urlaubsverwaltung.workingtime.WorkingTimeService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -23,6 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.synyx.urlaubsverwaltung.person.MailNotification.NOTIFICATION_BOSS_ALL;
 import static org.synyx.urlaubsverwaltung.person.MailNotification.NOTIFICATION_USER;
 import static org.synyx.urlaubsverwaltung.person.Role.BOSS;
+import static org.synyx.urlaubsverwaltung.person.Role.OFFICE;
 import static org.synyx.urlaubsverwaltung.person.Role.USER;
 import static org.synyx.urlaubsverwaltung.testdatacreator.TestDataCreator.createPerson;
 
@@ -33,15 +42,33 @@ public class PersonServiceImplTest {
 
     @Mock
     private PersonDAO personDAO;
+
+    @Mock
+    private AccountInteractionService accountInteractionService;
+
+    @Mock
+    private WorkingTimeService workingTimeService;
+
     @Mock
     private SecurityContext securityContext;
 
     @Before
     public void setUp() {
 
-        sut = new PersonServiceImpl(personDAO);
+        sut = new PersonServiceImpl(personDAO, accountInteractionService, workingTimeService);
     }
 
+    @After
+    public void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    public void ensureDefaultAccountAndWorkingTimeCreation() {
+        sut.create("rick", "Grimes", "Rick", "rick@grimes.de", emptyList(), emptyList());
+        verify(accountInteractionService).createDefaultAccount(any(Person.class));
+        verify(workingTimeService).createDefaultWorkingTime(any(Person.class));
+    }
 
     @Test
     public void ensureCreatedPersonHasCorrectAttributes() {
@@ -54,7 +81,7 @@ public class PersonServiceImplTest {
 
         Person createdPerson = sut.create(person);
 
-        Assert.assertEquals("Wrong login name", "rick", createdPerson.getLoginName());
+        Assert.assertEquals("Wrong username", "rick", createdPerson.getUsername());
         Assert.assertEquals("Wrong first name", "Rick", createdPerson.getFirstName());
         Assert.assertEquals("Wrong last name", "Grimes", createdPerson.getLastName());
         Assert.assertEquals("Wrong email", "rick@grimes.de", createdPerson.getEmail());
@@ -66,6 +93,9 @@ public class PersonServiceImplTest {
         Assert.assertEquals("Wrong number of permissions", 2, createdPerson.getPermissions().size());
         Assert.assertTrue("Missing permission", createdPerson.getPermissions().contains(USER));
         Assert.assertTrue("Missing permission", createdPerson.getPermissions().contains(BOSS));
+
+        verify(accountInteractionService).createDefaultAccount(person);
+        verify(workingTimeService).createDefaultWorkingTime(person);
     }
 
 
@@ -89,7 +119,7 @@ public class PersonServiceImplTest {
             asList(NOTIFICATION_USER, NOTIFICATION_BOSS_ALL),
             asList(USER, BOSS));
 
-        Assert.assertEquals("Wrong login name", "rick", updatedPerson.getLoginName());
+        Assert.assertEquals("Wrong username", "rick", updatedPerson.getUsername());
         Assert.assertEquals("Wrong first name", "Rick", updatedPerson.getFirstName());
         Assert.assertEquals("Wrong last name", "Grimes", updatedPerson.getLastName());
         Assert.assertEquals("Wrong email", "rick@grimes.de", updatedPerson.getEmail());
@@ -146,12 +176,10 @@ public class PersonServiceImplTest {
 
     @Test
     public void ensureGetPersonByLoginCallsCorrectDaoMethod() {
+        String username = "foo";
+        sut.getPersonByUsername(username);
 
-        String login = "foo";
-
-        sut.getPersonByLogin(login);
-
-        verify(personDAO).findByLoginName(login);
+        verify(personDAO).findByUsername(username);
     }
 
 
@@ -168,7 +196,7 @@ public class PersonServiceImplTest {
         boss.setPermissions(asList(USER, BOSS));
 
         Person office = createPerson("office");
-        office.setPermissions(asList(USER, BOSS, Role.OFFICE));
+        office.setPermissions(asList(USER, BOSS, OFFICE));
 
         List<Person> allPersons = asList(inactive, user, boss, office);
 
@@ -197,7 +225,7 @@ public class PersonServiceImplTest {
         boss.setPermissions(asList(USER, BOSS));
 
         Person office = createPerson("office");
-        office.setPermissions(asList(USER, BOSS, Role.OFFICE));
+        office.setPermissions(asList(USER, BOSS, OFFICE));
 
         List<Person> allPersons = asList(inactive, user, boss, office);
 
@@ -221,7 +249,7 @@ public class PersonServiceImplTest {
         boss.setPermissions(asList(USER, BOSS));
 
         Person office = createPerson("office");
-        office.setPermissions(asList(USER, BOSS, Role.OFFICE));
+        office.setPermissions(asList(USER, BOSS, OFFICE));
 
         List<Person> allPersons = asList(user, boss, office);
 
@@ -248,7 +276,7 @@ public class PersonServiceImplTest {
         boss.setNotifications(asList(NOTIFICATION_USER, NOTIFICATION_BOSS_ALL));
 
         Person office = createPerson("office");
-        office.setPermissions(asList(USER, BOSS, Role.OFFICE));
+        office.setPermissions(asList(USER, BOSS, OFFICE));
         office.setNotifications(asList(NOTIFICATION_USER, NOTIFICATION_BOSS_ALL,
             MailNotification.NOTIFICATION_OFFICE));
 
@@ -350,8 +378,6 @@ public class PersonServiceImplTest {
     @Test(expected = IllegalStateException.class)
     public void ensureThrowsIfNoPersonCanBeFoundForTheCurrentlySignedInUser() {
 
-        when(personDAO.findByLoginName(anyString())).thenReturn(null);
-
         sut.getSignedInUser();
     }
 
@@ -366,7 +392,7 @@ public class PersonServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(personDAO.findByLoginName(anyString())).thenReturn(person);
+        when(personDAO.findByUsername(anyString())).thenReturn(person);
 
         Person signedInUser = sut.getSignedInUser();
 
@@ -377,5 +403,40 @@ public class PersonServiceImplTest {
     public void ensureThrowsIllegalOnNullAuthentication() {
 
         sut.getSignedInUser();
+    }
+
+    @Test
+   public void ensureCanAppointPersonAsOfficeUser() {
+
+       when(personDAO.findAll()).thenReturn(emptyList());
+       when(personDAO.save(any())).then(returnsFirstArg());
+
+       final Person person = createPerson();
+       person.setPermissions(singletonList(USER));
+       assertThat(person.getPermissions()).containsOnly(USER);
+
+       final Person personWithOfficeRole = sut.appointAsOfficeUserIfNoOfficeUserPresent(person);
+
+       final Collection<Role> permissions = personWithOfficeRole.getPermissions();
+       assertThat(permissions).hasSize(2);
+       assertThat(permissions).contains(USER, OFFICE);
+   }
+
+    @Test
+    public void ensureCanNotAppointPersonAsOfficeUser() {
+
+        Person officePerson = new Person();
+        officePerson.setPermissions(singletonList(OFFICE));
+        when(personDAO.findAll()).thenReturn(singletonList(officePerson));
+
+        final Person person = createPerson();
+        person.setPermissions(singletonList(USER));
+        assertThat(person.getPermissions()).containsOnly(USER);
+
+        final Person personWithOfficeRole = sut.appointAsOfficeUserIfNoOfficeUserPresent(person);
+
+        final Collection<Role> permissions = personWithOfficeRole.getPermissions();
+        assertThat(permissions).hasSize(1);
+        assertThat(permissions).containsOnly(USER);
     }
 }

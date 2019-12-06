@@ -69,6 +69,7 @@ public class ApplicationValidator implements Validator {
     private static final String ATTRIBUTE_ADDRESS = "address";
     private static final String ATTRIBUTE_COMMENT = "comment";
     private static final String ATTRIBUTE_HOURS = "hours";
+    private static final String DAY_LENGTH = "dayLength";
 
     private final WorkingTimeService workingTimeService;
     private final WorkDaysService calendarService;
@@ -79,8 +80,8 @@ public class ApplicationValidator implements Validator {
 
     @Autowired
     public ApplicationValidator(WorkingTimeService workingTimeService, WorkDaysService calendarService,
-        OverlapService overlapService, CalculationService calculationService, SettingsService settingsService,
-        OvertimeService overtimeService) {
+                                OverlapService overlapService, CalculationService calculationService, SettingsService settingsService,
+                                OvertimeService overtimeService) {
 
         this.workingTimeService = workingTimeService;
         this.calendarService = calendarService;
@@ -114,7 +115,7 @@ public class ApplicationValidator implements Validator {
 
         // check if reason is not filled
         if (VacationCategory.SPECIALLEAVE.equals(applicationForm.getVacationType().getCategory())
-                && !StringUtils.hasText(applicationForm.getReason())) {
+            && !StringUtils.hasText(applicationForm.getReason())) {
             errors.rejectValue(ATTRIBUTE_REASON, ERROR_MISSING_REASON);
         }
 
@@ -156,19 +157,19 @@ public class ApplicationValidator implements Validator {
         switch (workingDurationForChristmasEve) {
             case ZERO:
                 if (applicationDayLength != DayLength.ZERO) {
-                    errors.rejectValue("dayLength", ERROR_ALREADY_ABSENT_ON_CHRISTMAS_EVE_FULL);
+                    errors.rejectValue(DAY_LENGTH, ERROR_ALREADY_ABSENT_ON_CHRISTMAS_EVE_FULL);
                     errors.reject(ERROR_ALREADY_ABSENT_ON_CHRISTMAS_EVE_FULL);
                 }
                 return;
             case MORNING:
                 if (applicationDayLength == DayLength.NOON) {
-                    errors.rejectValue("dayLength", ERROR_ALREADY_ABSENT_ON_CHRISTMAS_EVE_NOON);
+                    errors.rejectValue(DAY_LENGTH, ERROR_ALREADY_ABSENT_ON_CHRISTMAS_EVE_NOON);
                     errors.reject(ERROR_ALREADY_ABSENT_ON_CHRISTMAS_EVE_NOON);
                 }
                 return;
             case NOON:
                 if (applicationDayLength == DayLength.MORNING) {
-                    errors.rejectValue("dayLength", ERROR_ALREADY_ABSENT_ON_CHRISTMAS_EVE_MORNING);
+                    errors.rejectValue(DAY_LENGTH, ERROR_ALREADY_ABSENT_ON_CHRISTMAS_EVE_MORNING);
                     errors.reject(ERROR_ALREADY_ABSENT_ON_CHRISTMAS_EVE_MORNING);
                 }
                 return;
@@ -184,19 +185,19 @@ public class ApplicationValidator implements Validator {
         switch (workingDurationForNewYearsEve) {
             case ZERO:
                 if (applicationDayLength != DayLength.ZERO) {
-                    errors.rejectValue("dayLength", ERROR_ALREADY_ABSENT_ON_NEWYEARS_EVE_FULL);
+                    errors.rejectValue(DAY_LENGTH, ERROR_ALREADY_ABSENT_ON_NEWYEARS_EVE_FULL);
                     errors.reject(ERROR_ALREADY_ABSENT_ON_NEWYEARS_EVE_FULL);
                 }
                 return;
             case MORNING:
                 if (applicationDayLength == DayLength.NOON) {
-                    errors.rejectValue("dayLength", ERROR_ALREADY_ABSENT_ON_NEWYEARS_EVE_NOON);
+                    errors.rejectValue(DAY_LENGTH, ERROR_ALREADY_ABSENT_ON_NEWYEARS_EVE_NOON);
                     errors.reject(ERROR_ALREADY_ABSENT_ON_NEWYEARS_EVE_NOON);
                 }
                 return;
             case NOON:
                 if (applicationDayLength == DayLength.MORNING) {
-                    errors.rejectValue("dayLength", ERROR_ALREADY_ABSENT_ON_NEWYEARS_EVE_MORNING);
+                    errors.rejectValue(DAY_LENGTH, ERROR_ALREADY_ABSENT_ON_NEWYEARS_EVE_MORNING);
                     errors.reject(ERROR_ALREADY_ABSENT_ON_NEWYEARS_EVE_MORNING);
                 }
                 return;
@@ -251,7 +252,7 @@ public class ApplicationValidator implements Validator {
         LocalDate future = ZonedDateTime.now(UTC).plusMonths(maximumMonths).toLocalDate();
 
         if (date.isAfter(future)) {
-            errors.reject(ERROR_TOO_LONG, new Object[] { settings.getMaximumMonthsToApplyForLeaveInAdvance() }, null);
+            errors.reject(ERROR_TOO_LONG, new Object[]{settings.getMaximumMonthsToApplyForLeaveInAdvance()}, null);
         }
     }
 
@@ -268,7 +269,7 @@ public class ApplicationValidator implements Validator {
 
 
     private void validateSameDayIfHalfDayPeriod(LocalDate startDate, LocalDate endDate, DayLength dayLength,
-        Errors errors) {
+                                                Errors errors) {
 
         boolean isHalfDay = dayLength == DayLength.MORNING || dayLength == DayLength.NOON;
 
@@ -326,11 +327,11 @@ public class ApplicationValidator implements Validator {
 
 
     private void validateIfApplyingForLeaveIsPossible(ApplicationForLeaveForm applicationForm, Settings settings,
-        Errors errors) {
+                                                      Errors errors) {
 
         Application application = applicationForm.generateApplicationForLeave();
 
-        /**
+        /*
          * Ensure the person has a working time for the period of the application for leave
          */
         if (!personHasWorkingTime(application)) {
@@ -339,7 +340,7 @@ public class ApplicationValidator implements Validator {
             return;
         }
 
-        /**
+        /*
          * Ensure that no one applies for leave for a vacation of 0 days
          */
         if (vacationOfZeroDays(application)) {
@@ -348,7 +349,7 @@ public class ApplicationValidator implements Validator {
             return;
         }
 
-        /**
+        /*
          * Ensure that there is no application for leave and no sick note in the same period
          */
         if (vacationIsOverlapping(application)) {
@@ -357,7 +358,7 @@ public class ApplicationValidator implements Validator {
             return;
         }
 
-        /**
+        /*
          * Ensure that the person has enough vacation days left if the vacation type is
          * {@link org.synyx.urlaubsverwaltung.application.domain.VacationCategory.HOLIDAY}
          */
@@ -365,7 +366,7 @@ public class ApplicationValidator implements Validator {
             errors.reject(ERROR_NOT_ENOUGH_DAYS);
         }
 
-        /**
+        /*
          * Ensure that the person has enough overtime hours left if the vacation type is
          * {@link org.synyx.urlaubsverwaltung.application.domain.VacationCategory.OVERTIME}
          */
@@ -378,7 +379,7 @@ public class ApplicationValidator implements Validator {
     private boolean personHasWorkingTime(Application application) {
 
         Optional<WorkingTime> workingTime = workingTimeService.getByPersonAndValidityDateEqualsOrMinorDate(
-                application.getPerson(), application.getStartDate());
+            application.getPerson(), application.getStartDate());
 
         return workingTime.isPresent();
     }
@@ -387,7 +388,7 @@ public class ApplicationValidator implements Validator {
     private boolean vacationOfZeroDays(Application application) {
 
         BigDecimal days = calendarService.getWorkDays(application.getDayLength(), application.getStartDate(),
-                application.getEndDate(), application.getPerson());
+            application.getEndDate(), application.getPerson());
 
         return CalcUtil.isZero(days);
     }
@@ -415,11 +416,11 @@ public class ApplicationValidator implements Validator {
 
     private boolean enoughOvertimeHoursLeft(Application application, Settings settings) {
 
-        Boolean isOvertime = VacationCategory.OVERTIME.equals(application.getVacationType().getCategory());
+        boolean isOvertime = VacationCategory.OVERTIME.equals(application.getVacationType().getCategory());
 
         if (isOvertime) {
             WorkingTimeSettings workingTimeSettings = settings.getWorkingTimeSettings();
-            Boolean overtimeActive = workingTimeSettings.isOvertimeActive();
+            boolean overtimeActive = workingTimeSettings.isOvertimeActive();
 
             if (overtimeActive && application.getHours() != null) {
                 return checkOvertimeHours(application, workingTimeSettings);

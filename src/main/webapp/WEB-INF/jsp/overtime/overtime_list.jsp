@@ -5,9 +5,12 @@
 <%@taglib prefix="uv" tagdir="/WEB-INF/tags" %>
 
 <!DOCTYPE html>
-<html>
+<html lang="${language}">
 <head>
-    <uv:head/>
+    <title>
+        <spring:message code="overtime.header.title" arguments="${person.niceName}"/>
+    </title>
+    <uv:custom-head/>
 </head>
 <body>
 
@@ -55,7 +58,7 @@
                         <p><spring:message code="overtime.none"/></p>
                     </c:when>
                     <c:otherwise>
-                        <table class="list-table bordered-table selectable-table" cellspacing="0">
+                        <table class="list-table bordered-table selectable-table">
                             <tbody>
                             <c:forEach items="${records}" var="record">
                                 <tr onclick="navigate('${URL_PREFIX}/overtime/${record.id}');">
